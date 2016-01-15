@@ -3,22 +3,27 @@
 
 %sat abs?? 
 sat([]).
-sat(A) :- split_cnf(A,Ar), lsort(Ar,As), choosel(As,L), prop(L,As,R), build_cnf(R,CNF), sat(CNF), !. 
-sat(A) :- split_cnf(A,Ar), lsort(Ar,As), choosel(As,L), prop(-L,Ar,R), build_cnf(R,CNF), sat(CNF).
+sat(A) :- split_cnf(A,Ar), lsort(Ar,As), choosel(As,L), prop(L,As,R), build_cnf(R,CNF), \+abs(CNF), sat(CNF), !. 
+sat(A) :- split_cnf(A,Ar), lsort(Ar,As), choosel(As,L), prop(-L,Ar,R), build_cnf(R,CNF), \+abs(CNF), sat(CNF).
+
+%absurd
+abs(A* -A).
+abs(-A*A).
 
 %gets all the caluses
 split_cnf([],[]).
+split_cnf(X,[[X]]) :- (atom(X); X=..[-,_]), !.
 split_cnf(Expr,[LRR|R]) :- Expr=..[*,L,LR], split_cls(LR,LRR), split_cnf(L,R), !.
 split_cnf(Expr,[ExprR]) :- Expr=..[+,L,R], split_cls(Expr,ExprR).
+
+%gets clauses literals
+split_cls(X,[X]) :- (atom(X); X=..[-,_]), !.
+split_cls(X,[R|LR]) :- X=..[+,L,R], split_cls(L,LR), !.
 
 %unit propagation
 prop(A,[],[]).
 prop(A,[X|Xs],R) :- contains(A,X), prop(A,Xs,R), !.
 prop(A,[X|Xs],[Xr|R]) :- rmlit(A,X,Xr), prop(A,Xs,R).
-
-%gets clauses literals
-split_cls(X,[X]) :- (atom(X); X=..[-,_]), !.
-split_cls(X,[R|LR]) :- X=..[+,L,R], split_cls(L,LR), !.
 
 %removes literals
 rmlit(-A,[],[]).
