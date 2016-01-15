@@ -1,20 +1,20 @@
 :- use_module(library(lists)).
 
 
-%sat abs?? 
+%sat - sort (removes duplicates) -  backtracking???? 
 sat([]).
-sat(A) :- split_cnf(A,Ar), lsort(Ar,As), choosel(As,L), prop(L,As,R), build_cnf(R,CNF), \+abs(CNF), sat(CNF), !. 
-sat(A) :- split_cnf(A,Ar), lsort(Ar,As), choosel(As,L), prop(-L,Ar,R), build_cnf(R,CNF), \+abs(CNF), sat(CNF).
+sat(A) :- split_cnf(A,Asplit), sort(Asplit,Ar), lsort(Ar,As), choosel(As,L), prop(L,As,R), build_cnf(R,CNF), \+abs(CNF), sat(CNF), !. 
+sat(A) :- split_cnf(A,Asplit), sort(Asplit,Ar), lsort(Ar,As), choosel(As,L), prop(-L,Ar,R), build_cnf(R,CNF), \+abs(CNF), sat(CNF).
 
 %absurd
 abs(A* -A).
 abs(-A*A).
 
-%gets all the caluses
+%gets all the caluses - sort added
 split_cnf([],[]).
 split_cnf(X,[[X]]) :- (atom(X); X=..[-,_]), !.
-split_cnf(Expr,[LRR|R]) :- Expr=..[*,L,LR], split_cls(LR,LRR), split_cnf(L,R), !.
-split_cnf(Expr,[ExprR]) :- Expr=..[+,L,R], split_cls(Expr,ExprR).
+split_cnf(Expr,[LRRR|R]) :- Expr=..[*,L,LR], split_cls(LR,LRR), sort(LRR,LRRR), split_cnf(L,R), !.
+split_cnf(Expr,[ExprRR]) :- Expr=..[+,L,R], split_cls(Expr,ExprR), sort(ExprR,ExprRR).
 
 %gets clauses literals
 split_cls(X,[X]) :- (atom(X); X=..[-,_]), !.
@@ -60,3 +60,14 @@ build_cls([X|Xs],X+K) :- build_cls(Xs,K).
 build_cnf([],[]).
 build_cnf([X|Xs],(Xr)) :- length(Xs,0), build_cls(X,Xr), !.
 build_cnf([X|Xs],(Xr)*K) :-build_cls(X,Xr), build_cnf(Xs,K).
+
+%Eliminate consecutive duplicates of list elements.
+%compress([],[]) :- !.
+%compress([A|[]],[A]) :- !.
+%compress([A,A|B],R) :- compress([A|B],R), !.
+%compress([A,C|B],[A|R]) :- compress([C|B],R).
+
+
+
+
+				   
