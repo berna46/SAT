@@ -1,11 +1,10 @@
 :- use_module(library(lists)).
 
-%
 
-%sat
+%sat abs?? 
 sat([]).
-sat(A) :- split_cnf(A,Ar), lsort(Ar,As), choosel(As,L), prop(L,Ar,R), build_cnf(R,CNF), sat(CNF), !. 
-sat(A) :- split_cnf(A,Ar), lsort(Ar,As), choosel(As,L), prop(-L,Ar,R).
+sat(A) :- split_cnf(A,Ar), lsort(Ar,As), choosel(As,L), prop(L,As,R), build_cnf(R,CNF), sat(CNF), !. 
+sat(A) :- split_cnf(A,Ar), lsort(Ar,As), choosel(As,L), prop(-L,Ar,R), build_cnf(R,CNF), sat(CNF).
 
 %gets all the caluses
 split_cnf([],[]).
@@ -29,14 +28,14 @@ rmlit(-A,[X|Xs],[X|R]) :- rmlit(-A,Xs,R), !.
 rmlit(A,[-A|Xs],R) :- rmlit(A,Xs,R), !.
 rmlit(A,[X|Xs],[X|R]) :- rmlit(A,Xs,R).
 
-%checks if the list contains A
+%checks if the list (cluase) contains A
 contains(A,[A|_]).
 contains(A,[B|C]) :- contains(A,C).
 
-%chooses literal
+%choose literal
 choosel([[X|Xs]|Xss],X).
 
-%Sorting a list of lists according to length of sublists
+%Sorts a list of lists according to length of sublists
 lsort([],[]).
 lsort(A,R) :- keygen(A,RR), keysort(RR,RRR), del_key(RRR,R).
 
@@ -48,9 +47,11 @@ del_key([K-X|Xs],[X|R]) :- del_key(Xs,R).
 
 
 %builds clause from list
+build_cls([],[]).
 build_cls([X|Xs],X) :- length(Xs,0), !.
 build_cls([X|Xs],X+K) :- build_cls(Xs,K).
 
 %buils cnf from a list of clauses
+build_cnf([],[]).
 build_cnf([X|Xs],(Xr)) :- length(Xs,0), build_cls(X,Xr), !.
 build_cnf([X|Xs],(Xr)*K) :-build_cls(X,Xr), build_cnf(Xs,K).
