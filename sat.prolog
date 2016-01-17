@@ -50,12 +50,12 @@ del_key([K-X|Xs],[X|R]) :- del_key(Xs,R).
 %builds clause from list
 build_cls([],[]).
 build_cls([X|Xs],X) :- length(Xs,0), !.
-build_cls([X|Xs],X+K) :- build_cls(Xs,K), !.
+build_cls([X|Xs],K+X) :- build_cls(Xs,K), !.
 
 %buils cnf from a list of clauses
 build_cnf([],[]).
-build_cnf([X|Xs],(Xr)) :- length(Xs,0), build_cls(X,Xr), !.
-build_cnf([X|Xs],(Xr)*K) :- build_cls(X,Xr), build_cnf(Xs,K), !.
+build_cnf([X|Xs],Xr) :- length(Xs,0), build_cls(X,Xr), !.
+build_cnf([X|Xs],K*Xr) :- build_cls(X,Xr), build_cnf(Xs,K), !.
 
 %checks if the list (cluase) contains A
 contains(A1,[A2|_]) :- A1==A2, !.
