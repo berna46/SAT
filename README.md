@@ -1,8 +1,6 @@
 # SAT
 SAT solver -> uses the DPLL algorithm.
 
-Not the most efficient one...
-
 input/output  
 
 ?- sat(p1*(-p1+ -p2)*(p3+p2)*(-p7+p2)*(-p3+p4)*(-p3+p5)*(-p4+ -p+q)*(-p5+ -p6+r)*(-p+ -q+p6)*(p+p7)*(-r+p7),A).
