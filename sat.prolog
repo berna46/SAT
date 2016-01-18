@@ -8,7 +8,7 @@ sol([],_,[]).
 sol([X|Xs],As,[R1s|Rs]) :- append([[X]],As,R), \+abs(R), build_cnf(R,CNF), sat2(CNF,[],R1), sort(R1,R1s), sol(Xs,As,Rs), !.
 sol([X|Xs],As,R) :- sol(Xs,As,R), !.
 
-%sat algorithm
+%sat DPLL algorithm
 sat2([],R,R).
 sat2(A,Sls,Rs) :- split(A,As), \+abs(As), chooseu(As,L,Asc), L\==[], prop(L,Asc,Ap), insert(L,Sls,Sr), build_cnf(Ap,CNF), sat2(CNF,Sr,Rs), !.
 sat2(A,Sls,Rs) :- split(A,As), \+abs(As), choosel(As,L), (prop(L,As,R), insert(L,Sls,Sr); sim(L,M), prop(M,As,R), insert(M,Sls,Sr)), 
