@@ -1,18 +1,21 @@
 :- use_module(library(lists)).
 
-
 %sat - main clause
-s(A,Lts) :- split(A,As), getl(As,Lts).%, sol(Lts,As).
+sat(A,Rs) :- split(A,As), getl(As,Lts), sol(Lts,As,R), sort(R,Rs).
 
 %propagates every single literal
-sol([],_).
-sol([X|Xs],As) :- append([[X]],As,R), build_cnf(R,A), sat(A*X), sol(Xs,As).
+sol([],_,[]).
+sol([X|Xs],As,[R1|Rs]) :- append([[X]],As,R), \+abs(R), build_cnf(R,CNF), sat2(CNF,[],R1), sol(Xs,As,Rs), !.
+sol([X|Xs],As,R) :- sol(Xs,As,R), !.
 
 %sat algorithm
-sat(A) :- A==[]. %\+ sat([]).
-sat(A) :- split(A,As), \+abs(As), chooseu(As,L,Asc), L\==[], prop(L,Asc,Ap), (L=t; L=..[-,M], M=f), build_cnf(Ap,CNF), sat(CNF), !.
-sat(A) :- split(A,As), \+abs(As), choosel(As,L), (prop(L,As,R), L=t; sim(L,M), prop(M,As,R), M=t), build_cnf(R,CNF), sat(CNF), !.
+sat2([],R,R).
+sat2(A,Sls,Rs) :- split(A,As), \+abs(As), chooseu(As,L,Asc), L\==[], prop(L,Asc,Ap), insert(L,Sls,Sr), build_cnf(Ap,CNF), sat2(CNF,Sr,Rs), !.
+sat2(A,Sls,Rs) :- split(A,As), \+abs(As), choosel(As,L), (prop(L,As,R), M=L; sim(L,M), prop(M,As,R)), insert(M,Sls,Sr),
+	          build_cnf(R,CNF), sat2(CNF,Sr,Rs), !.
 
+%adds value(K-t) to the list(L)
+insert(K,L,R) :- \+member(K-t,L), append([K-t],L,R).
 
 %gets all literals (no duplicates)
 getl(A,X) :- flatten(A,R), sort(R,X).
@@ -31,7 +34,7 @@ split_cls(X,[R|LR]) :- X=..[+,L,R], split_cls(L,LR), !.
 
 %unit propagation
 prop(A,[],[]).
-prop(A,[X|Xs],R) :- contains(A,X), prop(A,Xs,R).
+prop(A,[X|Xs],R) :- member(A,X), prop(A,Xs,R).
 prop(A,[X|Xs],[Xr|R]) :- rmlit(A,X,Xr), prop(A,Xs,R), !.
 
 %removes literals - length(Xs,N), N>0,
@@ -68,14 +71,10 @@ build_cnf([],[]).
 build_cnf([X|Xs],Xr) :- length(Xs,0), build_cls(X,Xr), !.
 build_cnf([X|Xs],K*Xr) :- build_cls(X,Xr), build_cnf(Xs,K), !.
 
-%checks if the list (cluase) contains A
-contains(A1,[A2|_]) :- A1==A2, !.
-contains(A,[B|C]) :- contains(A,C), !.
-
 %convert var to its simetric
-sim(L,-L) :- var(L), !.
+sim(L,-L) :- atom(L), !.
 sim(L,X) :- L=..[-,X], !.
 
 %absurd
-abs([[X|Xs]|Xss]) :- length([X|Xs],1), (X=..[-,A], contains([A],Xss); contains([-X],Xss)), !.
+abs([[X|Xs]|Xss]) :- length([X|Xs],1), (X=..[-,A], member([A],Xss); member([-X],Xss)), !.
 abs([X|Xs]) :- abs(Xs), !.
