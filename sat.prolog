@@ -5,7 +5,7 @@ sat(A,Rs) :- split(A,As), getl(As,Lts), sol(Lts,As,R), sort(R,Rs).
 
 %propagates every single literal
 sol([],_,[]).
-sol([X|Xs],As,[R1|Rs]) :- append([[X]],As,R), \+abs(R), build_cnf(R,CNF), sat2(CNF,[],R1), sol(Xs,As,Rs), !.
+sol([X|Xs],As,[R1s|Rs]) :- append([[X]],As,R), \+abs(R), build_cnf(R,CNF), sat2(CNF,[],R1), sort(R1,R1s), sol(Xs,As,Rs), !.
 sol([X|Xs],As,R) :- sol(Xs,As,R), !.
 
 %sat algorithm
