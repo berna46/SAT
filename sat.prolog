@@ -11,11 +11,11 @@ sol([X|Xs],As,R) :- sol(Xs,As,R), !.
 %sat algorithm
 sat2([],R,R).
 sat2(A,Sls,Rs) :- split(A,As), \+abs(As), chooseu(As,L,Asc), L\==[], prop(L,Asc,Ap), insert(L,Sls,Sr), build_cnf(Ap,CNF), sat2(CNF,Sr,Rs), !.
-sat2(A,Sls,Rs) :- split(A,As), \+abs(As), choosel(As,L), (prop(L,As,R), M=L; sim(L,M), prop(M,As,R)), insert(M,Sls,Sr),
+sat2(A,Sls,Rs) :- split(A,As), \+abs(As), choosel(As,L), (prop(L,As,R), insert(L,Sls,Sr); sim(L,M), prop(M,As,R), insert(M,Sls,Sr)), 
 	          build_cnf(R,CNF), sat2(CNF,Sr,Rs), !.
 
 %adds value(K-t) to the list(L)
-insert(K,L,R) :- \+member(K-t,L), append([K-t],L,R).
+insert(K,L,R) :- K\==[], \+member(K-t,L), append([K-t],L,R).
 
 %gets all literals (no duplicates)
 getl(A,X) :- flatten(A,R), sort(R,X).
