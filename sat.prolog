@@ -43,14 +43,14 @@ rmlit(A,[B|Xs],R) :- A=..[-,A1], A1==B, rmlit(A,Xs,R), !.
 rmlit(A,[B|Xs],R) :- B=..[-,B1], A==B1, rmlit(A,Xs,R), !.
 rmlit(A,[X|Xs],[X|R]) :- rmlit(A,Xs,R), !.
 
-%choose unit clause
+%chooses a unit clause
 chooseu([[X|Xs]|Xss],X,Xss) :- length(Xs,0), !.
 chooseu(X,[],X).
 
-%choose literal from clause
+%chooses a literal from clause
 choosel([[X|Xs]|Xss],X).
 
-%Sorts a list of lists according to length of sublists
+%sorts a list of lists according to length of sublists
 lsort([],[]).
 lsort(A,R) :- keygen(A,RR), keysort(RR,RRR), del_key(RRR,R).
 
@@ -61,17 +61,17 @@ del_key([],[]).
 del_key([K-X|Xs],[X|R]) :- del_key(Xs,R).
 
 
-%builds clause from list
+%builds a clause from a list
 build_cls([],[]).
 build_cls([X|Xs],X) :- length(Xs,0), !.
 build_cls([X|Xs],K+X) :- build_cls(Xs,K), !.
 
-%buils cnf from a list of clauses
+%buils a cnf from a list of clauses
 build_cnf([],[]).
 build_cnf([X|Xs],Xr) :- length(Xs,0), build_cls(X,Xr), !.
 build_cnf([X|Xs],K*Xr) :- build_cls(X,Xr), build_cnf(Xs,K), !.
 
-%convert var to its simetric
+%converts an atom to its simetric
 sim(L,-L) :- atom(L), !.
 sim(L,X) :- L=..[-,X], !.
 
